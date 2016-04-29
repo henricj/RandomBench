@@ -27,6 +27,11 @@ const int REPETITIONS_PER_PASS = 10000;
 const int PASSES = 7;
 const int ALIGN_BYTES = 256;
 
+#if __cplusplus >= 201402L || _MSC_VER >= 1900
+#define HAVE_MAKE_UNIQUE_ARRAY
+#endif
+
+#ifdef HAVE_MAKE_UNIQUE_ARRAY
 template<typename T, int alignment = 32>
 class AlignedAllocated
 {
@@ -48,6 +53,7 @@ public:
         return new (buffer_block) T;
     }
 };
+#endif
 
 template<typename V, typename W>
 void
@@ -210,9 +216,13 @@ void MeasureEngineDiscard(Engine& eng, int passes)
 template<typename Engine>
 void MeasureEngine(Engine& eng, int passes)
 {
+#ifdef HAVE_MAKE_UNIQUE_ARRAY
     AlignedAllocated<array<typename Engine::result_type, BLOCK_SIZE>, ALIGN_BYTES> buffer_handle;
 
     auto buffer = *buffer_handle.Create();
+#else
+    array<typename Engine::result_type, BLOCK_SIZE> buffer;
+#endif
 
     eng();
 
@@ -246,9 +256,13 @@ void MeasureEngine(Engine& eng, int passes)
 template<typename Engine>
 void MeasureEngineWithScale(Engine& eng, int passes)
 {
+#ifdef HAVE_MAKE_UNIQUE_ARRAY
     AlignedAllocated<array<float, BLOCK_SIZE>, ALIGN_BYTES> buffer_handle;
 
     auto buffer = *buffer_handle.Create();
+#else
+    array<float, BLOCK_SIZE> buffer;
+#endif
 
     eng();
 
@@ -279,9 +293,13 @@ void MeasureEngineWithScale(Engine& eng, int passes)
 template<typename Engine, typename Distribution>
 void MeasureWithDistribution(Engine& eng, Distribution& dist, int passes)
 {
+#ifdef HAVE_MAKE_UNIQUE_ARRAY
     AlignedAllocated<array<typename Distribution::result_type, BLOCK_SIZE>, ALIGN_BYTES> buffer_handle;
 
     auto buffer = *buffer_handle.Create();
+#else
+    array<typename Distribution::result_type, BLOCK_SIZE> buffer;
+#endif
 
     eng();
 
