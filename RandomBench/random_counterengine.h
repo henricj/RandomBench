@@ -1,5 +1,5 @@
-#ifndef RANDOM_NULLENGINE_H
-#define RANDOM_NULLEGINE_H
+#ifndef RANDOM_COUNTERENGINE_H
+#define RANDOM_COUNTERENGINE_H
 
 #include <array>
 #include <random>
@@ -66,4 +66,4 @@ public:
 };
 }
 
-#endif // RANDOM_NULLENGINE_H
+#endif // RANDOM_COUNTERENGINE_H
