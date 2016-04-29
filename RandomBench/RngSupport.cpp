@@ -9,7 +9,7 @@
 #include <chrono>
 #include <random>
 
-#define USE_RDRAND
+//#define USE_RDRAND
 
 #ifdef USE_RDRAND
 #include <immintrin.h>
