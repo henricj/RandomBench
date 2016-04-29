@@ -5,6 +5,7 @@
 #include "random_xorshift128plus.h"
 #include "random_xoroshiro128plus.h"
 #include "random_xorshift1024star.h"
+//#include "random_rdrandengine.h"
 #include "random_counterengine.h"
 #include "random_zeroengine.h"
 
@@ -351,6 +352,7 @@ int main()
     Nyq::NyqEngine<xorshift1024star> eng_xorshift1024star;
     //Nyq::NyqEngine<minstd_rand> eng_minstd;
     //Nyq::NyqEngine<knuth_b> eng_knuth;
+    //Nyq::NyqEngine<rdrandengine> eng_rdrand;
     Nyq::NyqEngine<counterengine> eng_counter;
     Nyq::NyqEngine<zeroengine> eng_zero;
 
@@ -367,6 +369,7 @@ int main()
 
     Measure("xorshift1024star", eng_xorshift1024star, dist);
 
+    //Measure("rdrand", eng_rdrand, dist);
 #if false
     Measure("minstd", eng_minstd, dist);
 
