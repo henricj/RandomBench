@@ -11,6 +11,9 @@ using namespace std;
 
 class xorshift1024star
 {
+    // From http://xorshift.di.unimi.it/
+    // http://xorshift.di.unimi.it/xorshift1024star.c
+    // "Written in 2014-2015 by Sebastiano Vigna (vigna@acm.org)"
     int p_;
     uint64_t s_[16];
 public:

@@ -10,6 +10,9 @@ using namespace std;
 
 class xorshift128plus
 {
+    // From http://xorshift.di.unimi.it/
+    // http://xorshift.di.unimi.it/xorshift128plus.c
+    // "Written in 2014-2016 by Sebastiano Vigna (vigna@acm.org)"
     uint64_t s0_;
     uint64_t s1_;
 public:
@@ -28,16 +31,16 @@ public:
 
     result_type operator()()
     {
-        result_type x = s0_;
-        const result_type y = s1_;
+        result_type s1 = s0_;
+        const result_type s0 = s1_;
 
-        s0_ = y;
+        s0_ = s0;
 
-        x ^= x << 23;
+        s1 ^= s1 << 23;
 
-        s1_ = x ^ y ^ (x >> 17) ^ (y >> 26);
+        s1_ = s1 ^ s0 ^ (s1 >> 18) ^ (s0 >> 5);
 
-        return s1_ + y;
+        return s1_ + s0;
     }
 
     static constexpr result_type min()

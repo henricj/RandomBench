@@ -12,6 +12,7 @@ class xoroshiro128plus
 {
     // From http://xorshift.di.unimi.it/
     // http://xorshift.di.unimi.it/xoroshiro128plus.c
+    // "Written in 2016 by David Blackman and Sebastiano Vigna (vigna@acm.org)"
     uint64_t s0_;
     uint64_t s1_;
 
