@@ -19,7 +19,26 @@ using namespace std;
 #define NOINLINE __attribute__ ((noinline))
 #endif
 
-namespace {
+namespace
+{
+// From http://stackoverflow.com/questions/28287064/how-not-to-optimize-away-mechanics-of-a-folly-function
+#ifdef _MSC_VER
+
+#pragma optimize("", off)
+
+template<typename T>
+void MarkUsed(T&& x)
+{
+}
+
+#pragma optimize("", on)
+
+#else
+template<typename T>
+void MarkUsed(T&& x) {
+    asm volatile("" : "+r" (x));
+}
+#endif
 
 typedef chrono::duration<double, nano> DoubleNanoseconds;
 
@@ -51,7 +70,7 @@ public:
         if (nullptr == buffer_block)
             return nullptr;
 
-        return new (buffer_block) T;
+        return new(buffer_block) T;
     }
 };
 #endif
@@ -232,7 +251,10 @@ void MeasureEngine(Engine& eng, int passes)
         auto start = chrono::high_resolution_clock::now();
 
         for (auto j = 0; j < REPETITIONS_PER_PASS; ++j)
+        {
             use_rand(&buffer[0], buffer.size());
+            MarkUsed(buffer);
+        }
 
         auto end = chrono::high_resolution_clock::now();
 
@@ -244,6 +266,7 @@ void MeasureEngine(Engine& eng, int passes)
         {
             use_random(eng, &buffer[0], buffer.size());
             //use_random(eng, buffer.begin(), buffer.end());
+            MarkUsed(buffer);
         }
 
         end = chrono::high_resolution_clock::now();
@@ -272,7 +295,10 @@ void MeasureEngineWithScale(Engine& eng, int passes)
         auto start = chrono::high_resolution_clock::now();
 
         for (auto j = 0; j < REPETITIONS_PER_PASS; ++j)
+        {
             use_rand(&buffer[0], buffer.size());
+            MarkUsed(buffer);
+        }
 
         auto end = chrono::high_resolution_clock::now();
 
@@ -281,7 +307,10 @@ void MeasureEngineWithScale(Engine& eng, int passes)
         start = chrono::high_resolution_clock::now();
 
         for (auto j = 0; j < REPETITIONS_PER_PASS; ++j)
+        {
             use_random_scale(eng, &buffer[0], buffer.size());
+            MarkUsed(buffer);
+        }
 
         end = chrono::high_resolution_clock::now();
 
@@ -309,7 +338,10 @@ void MeasureWithDistribution(Engine& eng, Distribution& dist, int passes)
         auto start = chrono::high_resolution_clock::now();
 
         for (auto j = 0; j < REPETITIONS_PER_PASS; ++j)
+        {
             use_rand(&buffer[0], buffer.size());
+            MarkUsed(buffer);
+        }
 
         auto end = chrono::high_resolution_clock::now();
 
@@ -318,7 +350,10 @@ void MeasureWithDistribution(Engine& eng, Distribution& dist, int passes)
         start = chrono::high_resolution_clock::now();
 
         for (auto j = 0; j < REPETITIONS_PER_PASS; ++j)
+        {
             use_random(eng, dist, &buffer[0], buffer.size());
+            MarkUsed(buffer);
+        }
 
         end = chrono::high_resolution_clock::now();
 
@@ -382,4 +417,3 @@ int main()
 
     return 0;
 }
-

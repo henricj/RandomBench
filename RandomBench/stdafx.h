@@ -7,6 +7,18 @@
 
 #ifdef _MSC_VER
 #include "targetver.h"
+#define VC_EXTRALEAN
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
+
 #endif // _MSC_VER
 
 #include <stdio.h>
