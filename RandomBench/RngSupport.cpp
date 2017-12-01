@@ -12,7 +12,7 @@
 //#define USE_RDRAND
 
 #ifdef USE_RDRAND
-#include <immintrin.h>
+#include <intrin.h>
 #endif
 
 using namespace std;
