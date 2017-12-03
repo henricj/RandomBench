@@ -56,5 +56,8 @@
     <ClCompile Include="RngSupport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GoogleBench.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

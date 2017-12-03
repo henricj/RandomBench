@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#if 0
+
 #include "RngSupport.h"
 
 #include "random_xorshift128plus.h"
@@ -417,3 +419,5 @@ int main()
 
     return 0;
 }
+
+#endif // 0

@@ -11,6 +11,7 @@
 #include "random_zeroengine.h"
 
 #include <ppltasks.h>
+#include "benchmark/benchmark.h"
 
 
 template<typename Engine>
