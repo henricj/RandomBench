@@ -71,13 +71,13 @@ namespace ExtraGenerators
 
                 v |= static_cast<uint64_t>(*pb++) << 32;
 
-                key_.m128i_i64[i] = v;
+                key_.m128i_u64[i] = v;
 
                 v = *pb++;
 
                 v |= static_cast<uint64_t>(*pb++) << 32;
 
-                count_.m128i_i64[i] = v;
+                count_.m128i_u64[i] = v;
             }
         }
 
@@ -158,13 +158,13 @@ namespace ExtraGenerators
 
                 v |= static_cast<uint64_t>(*pb++) << 32;
 
-                key_.m128i_i64[i] = v;
+                key_.m128i_u64[i] = v;
 
                 v = *pb++;
 
                 v |= static_cast<uint64_t>(*pb++) << 32;
 
-                count_.m128i_i64[i] = v;
+                count_.m128i_u64[i] = v;
             }
 
             i_ = 0;
@@ -246,7 +246,7 @@ namespace ExtraGenerators
 
                 v |= static_cast<uint64_t>(*pb++) << 32;
 
-                count_.m128i_i64[i] = v;
+                count_.m128i_u64[i] = v;
 
                 for (auto j = 0; j < Rounds; ++j)
                 {
@@ -254,7 +254,7 @@ namespace ExtraGenerators
 
                     v |= static_cast<uint64_t>(*pb++) << 32;
 
-                    key_[j].m128i_i64[i] = v;
+                    key_[j].m128i_u64[i] = v;
                 }
             }
         }
@@ -302,7 +302,7 @@ namespace ExtraGenerators
             if (i_ >= 2)
                 stir();
 
-            return value_.m128i_i64[i_++];
+            return value_.m128i_u64[i_++];
         }
 
         static constexpr result_type min()
@@ -339,13 +339,199 @@ namespace ExtraGenerators
 
                 v |= static_cast<uint64_t>(*pb++) << 32;
 
-                value_.m128i_i64[i] = v;
+                value_.m128i_u64[i] = v;
 
                 v = *pb++;
 
                 v |= static_cast<uint64_t>(*pb++) << 32;
 
-                key_.m128i_i64[i] = v;
+                key_.m128i_u64[i] = v;
+            }
+
+            stir();
+        }
+
+        void discard(unsigned long long count)
+        {
+        }
+    };
+
+    template<int Rounds = 1>
+    class aesni1_u32
+    {
+    private:
+        __m128i key_;
+        __m128i value_;
+
+        int i_ = 0;
+
+        void stir()
+        {
+            for (auto i = 0; i < Rounds; ++i)
+            {
+                value_ = _mm_aesenc_si128(value_, key_);
+            }
+
+            i_ = 0;
+        }
+
+    public:
+        typedef uint32_t result_type;
+
+        explicit aesni1_u32(result_type x = 1)
+        {
+            seed(x);
+        }
+
+        template<class Seq>
+        explicit aesni1_u32(Seq& seq)
+        {
+            seed(seq);
+        }
+
+        result_type operator()()
+        {
+            if (i_ >= 4)
+                stir();
+
+            return value_.m128i_u32[i_++];
+        }
+
+        static constexpr result_type min()
+        {
+            return numeric_limits<result_type>::min();
+        }
+
+        static constexpr result_type max()
+        {
+            return numeric_limits<result_type>::max();
+        }
+
+        static constexpr size_t seed_words = sizeof(decltype(value_)) + sizeof(decltype(key_)) / sizeof(unsigned int);
+
+        void seed(result_type s)
+        {
+            seed_seq seq{ s };
+
+            seed(seq);
+        }
+
+        template<class Seq>
+        void seed(Seq& seq)
+        {
+            array<unsigned int, seed_words> buffer;
+
+            seq.generate(begin(buffer), end(buffer));
+
+            auto pb = begin(buffer);
+
+            for (auto i = 0; i < 2; ++i)
+            {
+                uint64_t v = *pb++;
+
+                v |= static_cast<uint64_t>(*pb++) << 32;
+
+                value_.m128i_u64[i] = v;
+
+                v = *pb++;
+
+                v |= static_cast<uint64_t>(*pb++) << 32;
+
+                key_.m128i_u64[i] = v;
+            }
+
+            stir();
+        }
+
+        void discard(unsigned long long count)
+        {
+        }
+    };
+
+    template<int Rounds = 1>
+    class aesni1_rekey
+    {
+    private:
+        __m128i key_;
+        __m128i value_;
+
+        int i_ = 0;
+
+        void stir()
+        {
+            for (auto i = 0; i < Rounds; ++i)
+            {
+                value_ = _mm_aesenc_si128(value_, key_);
+            }
+
+            key_ = _mm_xor_si128(key_, value_);
+
+            i_ = 0;
+        }
+
+    public:
+        typedef uint64_t result_type;
+
+        explicit aesni1_rekey(result_type x = 1)
+        {
+            seed(x);
+        }
+
+        template<class Seq>
+        explicit aesni1_rekey(Seq& seq)
+        {
+            seed(seq);
+        }
+
+        result_type operator()()
+        {
+            if (i_ >= 2)
+                stir();
+
+            return value_.m128i_u64[i_++];
+        }
+
+        static constexpr result_type min()
+        {
+            return numeric_limits<result_type>::min();
+        }
+
+        static constexpr result_type max()
+        {
+            return numeric_limits<result_type>::max();
+        }
+
+        static constexpr size_t seed_words = sizeof(decltype(value_)) + sizeof(decltype(key_)) / sizeof(unsigned int);
+
+        void seed(result_type s)
+        {
+            seed_seq seq{ s };
+
+            seed(seq);
+        }
+
+        template<class Seq>
+        void seed(Seq& seq)
+        {
+            array<unsigned int, seed_words> buffer;
+
+            seq.generate(begin(buffer), end(buffer));
+
+            auto pb = begin(buffer);
+
+            for (auto i = 0; i < 2; ++i)
+            {
+                uint64_t v = *pb++;
+
+                v |= static_cast<uint64_t>(*pb++) << 32;
+
+                value_.m128i_u64[i] = v;
+
+                v = *pb++;
+
+                v |= static_cast<uint64_t>(*pb++) << 32;
+
+                key_.m128i_u64[i] = v;
             }
 
             stir();
@@ -398,10 +584,10 @@ namespace ExtraGenerators
             {
                 j_ = 1;
 
-                return s_[i_].m128i_i64[0];
+                return s_[i_].m128i_u64[0];
             }
 
-            const auto ret = s_[i_].m128i_i64[1];
+            const auto ret = s_[i_].m128i_u64[1];
 
             j_ = 0;
 
@@ -446,7 +632,7 @@ namespace ExtraGenerators
 
                     v |= static_cast<uint64_t>(*pb++) << 32;
 
-                    s->m128i_i64[i] = v;
+                    s->m128i_u64[i] = v;
                 }
             }
 
@@ -502,10 +688,10 @@ namespace ExtraGenerators
             {
                 j_ = 1;
 
-                return s_[i_].m128i_i64[0];
+                return s_[i_].m128i_u64[0];
             }
 
-            const auto ret = s_[i_].m128i_i64[1];
+            const auto ret = s_[i_].m128i_u64[1];
 
             j_ = 0;
 
@@ -550,7 +736,7 @@ namespace ExtraGenerators
 
                     v |= static_cast<uint64_t>(*pb++) << 32;
 
-                    s->m128i_i64[i] = v;
+                    s->m128i_u64[i] = v;
                 }
             }
 
@@ -610,10 +796,10 @@ namespace ExtraGenerators
             {
                 j_ = 1;
 
-                return s_[i_].m128i_i64[0];
+                return s_[i_].m128i_u64[0];
             }
 
-            const auto ret = s_[i_].m128i_i64[1];
+            const auto ret = s_[i_].m128i_u64[1];
 
             j_ = 0;
 
@@ -658,7 +844,109 @@ namespace ExtraGenerators
 
                     v |= static_cast<uint64_t>(*pb++) << 32;
 
-                    s->m128i_i64[i] = v;
+                    s->m128i_u64[i] = v;
+                }
+            }
+
+            stir();
+        }
+
+        void discard(unsigned long long count)
+        {
+        }
+    };
+
+    template<int Rounds = 1>
+    class aesni8_u32
+    {
+    private:
+        constexpr static int elements = 8;
+        std::array<__m128i, elements> s_;
+        int i_ = 0;
+        int j_ = 0;
+
+        void stir()
+        {
+            for (auto i = 0; i < Rounds; ++i)
+            {
+                const auto s0 = s_[0];
+
+                s_[0] = _mm_aesenc_si128(s_[1], s0);
+                s_[1] = _mm_aesenc_si128(s_[2], s_[1]);
+                s_[2] = _mm_aesenc_si128(s_[3], s_[2]);
+                s_[3] = _mm_aesenc_si128(s_[4], s_[3]);
+                s_[4] = _mm_aesenc_si128(s_[5], s_[4]);
+                s_[5] = _mm_aesenc_si128(s_[6], s_[5]);
+                s_[6] = _mm_aesenc_si128(s_[7], s_[6]);
+                s_[7] = _mm_aesenc_si128(s0, s_[7]);
+            }
+
+            i_ = j_ = 0;
+        }
+
+    public:
+        typedef uint64_t result_type;
+
+        explicit aesni8_u32(result_type x = 1)
+        {
+            seed(x);
+        }
+
+        template<class Seq>
+        explicit aesni8_u32(Seq& seq)
+        {
+            seed(seq);
+        }
+
+        result_type operator()()
+        {
+            if (j_ >= 4)
+            {
+                j_ = 0;
+
+                if (++i_ >= s_.size())
+                    stir();
+            }
+
+            return s_[i_].m128i_u32[j_++];
+        }
+
+        static constexpr result_type min()
+        {
+            return numeric_limits<result_type>::min();
+        }
+
+        static constexpr result_type max()
+        {
+            return numeric_limits<result_type>::max();
+        }
+
+        static constexpr size_t seed_words = elements * sizeof(decltype(s_)::value_type) / sizeof(unsigned int);
+
+        void seed(result_type s)
+        {
+            seed_seq seq{ s };
+
+            seed(seq);
+        }
+
+        template<class Seq>
+        void seed(Seq& seq)
+        {
+            array<unsigned int, seed_words> buffer;
+
+            seq.generate(begin(buffer), end(buffer));
+
+            auto pb = begin(buffer);
+            for (auto s = begin(s_); s != end(s_); ++s)
+            {
+                for (auto i = 0; i < 2; ++i)
+                {
+                    uint64_t v = *pb++;
+
+                    v |= static_cast<uint64_t>(*pb++) << 32;
+
+                    s->m128i_u64[i] = v;
                 }
             }
 
@@ -726,10 +1014,10 @@ namespace ExtraGenerators
             {
                 j_ = 1;
 
-                return s_[i_].m128i_i64[0];
+                return s_[i_].m128i_u64[0];
             }
 
-            const auto ret = s_[i_].m128i_i64[1];
+            const auto ret = s_[i_].m128i_u64[1];
 
             j_ = 0;
 
@@ -774,7 +1062,117 @@ namespace ExtraGenerators
 
                     v |= static_cast<uint64_t>(*pb++) << 32;
 
-                    s->m128i_i64[i] = v;
+                    s->m128i_u64[i] = v;
+                }
+            }
+
+            stir();
+        }
+
+        void discard(unsigned long long count)
+        {
+        }
+    };
+
+    template<int Rounds = 1>
+    class aesni16_u32
+    {
+    private:
+        constexpr static int elements = 16;
+        std::array<__m128i, elements> s_;
+        int i_ = 0;
+        int j_ = 0;
+
+        void stir()
+        {
+            for (auto i = 0; i < Rounds; ++i)
+            {
+                const auto s0 = s_[0];
+
+                s_[0] = _mm_aesenc_si128(s_[1], s0);
+                s_[1] = _mm_aesenc_si128(s_[2], s_[1]);
+                s_[2] = _mm_aesenc_si128(s_[3], s_[2]);
+                s_[3] = _mm_aesenc_si128(s_[4], s_[3]);
+                s_[4] = _mm_aesenc_si128(s_[5], s_[4]);
+                s_[5] = _mm_aesenc_si128(s_[6], s_[5]);
+                s_[6] = _mm_aesenc_si128(s_[7], s_[6]);
+                s_[7] = _mm_aesenc_si128(s_[8], s_[7]);
+                s_[8] = _mm_aesenc_si128(s_[9], s_[8]);
+                s_[9] = _mm_aesenc_si128(s_[10], s_[9]);
+                s_[10] = _mm_aesenc_si128(s_[11], s_[10]);
+                s_[11] = _mm_aesenc_si128(s_[12], s_[11]);
+                s_[12] = _mm_aesenc_si128(s_[13], s_[12]);
+                s_[13] = _mm_aesenc_si128(s_[14], s_[13]);
+                s_[14] = _mm_aesenc_si128(s_[15], s_[14]);
+                s_[15] = _mm_aesenc_si128(s0, s_[15]);
+            }
+
+            i_ = j_ = 0;
+        }
+
+    public:
+        typedef uint32_t result_type;
+
+        explicit aesni16_u32(result_type x = 1)
+        {
+            seed(x);
+        }
+
+        template<class Seq>
+        explicit aesni16_u32(Seq& seq)
+        {
+            seed(seq);
+        }
+
+        result_type operator()()
+        {
+            if (j_ >= 4)
+            {
+                j_ = 0;
+
+                if (++i_ >= s_.size())
+                    stir();
+            }
+
+            return s_[i_].m128i_u32[j_++];
+        }
+
+        static constexpr result_type min()
+        {
+            return numeric_limits<result_type>::min();
+        }
+
+        static constexpr result_type max()
+        {
+            return numeric_limits<result_type>::max();
+        }
+
+        static constexpr size_t seed_words = elements * sizeof(decltype(s_)::value_type) / sizeof(unsigned int);
+
+        void seed(result_type s)
+        {
+            seed_seq seq{ s };
+
+            seed(seq);
+        }
+
+        template<class Seq>
+        void seed(Seq& seq)
+        {
+            array<unsigned int, seed_words> buffer;
+
+            seq.generate(begin(buffer), end(buffer));
+
+            auto pb = begin(buffer);
+            for (auto s = begin(s_); s != end(s_); ++s)
+            {
+                for (auto i = 0; i < 2; ++i)
+                {
+                    uint64_t v = *pb++;
+
+                    v |= static_cast<uint64_t>(*pb++) << 32;
+
+                    s->m128i_u64[i] = v;
                 }
             }
 
@@ -799,10 +1197,16 @@ namespace ExtraGenerators
             for (auto i = 0; i < Rounds; ++i)
             {
                 const auto s0 = s_[0];
+                auto previous = s0;
 
-                for (auto j = 0; j < Elements - 1; ++j)
-                    s_[j] = _mm_aesenc_si128(s_[j + 1], s0);
-                s_[Elements - 1] = _mm_aesenc_si128(s0, s_[Elements - 1]);
+                for (auto j = 0; j < Elements - 2; ++j)
+                {
+                    auto value = s_[j + 1];
+                    s_[j] = _mm_aesenc_si128(value, previous);
+                    previous = value;
+                }
+
+                s_[Elements - 1] = _mm_aesenc_si128(s0, previous);
             }
 
             i_ = j_ = 0;
