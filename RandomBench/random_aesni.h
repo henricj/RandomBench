@@ -1411,14 +1411,16 @@ namespace ExtraGenerators
             {
                 auto *p = reinterpret_cast<__m128i*>(&s_[0]);
 
-                const auto s0 = _mm_load_si128(p++);
+                const auto s0 = _mm_load_si128(p);
                 auto previous = s0;
 
-                for (auto j = 0; j < Elements - 2; ++j)
+                for (auto j = 0; j < Elements - 1; ++j)
                 {
-                    const auto value = _mm_load_si128(p);
+                    const auto pj = p;
 
-                    _mm_store_si128(p++, _mm_aesenc_si128(value, previous));
+                    const auto value = _mm_load_si128(++p);
+
+                    _mm_store_si128(pj, _mm_aesenc_si128(value, previous));
 
                     previous = value;
                 }
