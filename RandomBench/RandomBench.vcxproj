@@ -171,18 +171,26 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="randen.h" />
+    <ClInclude Include="random_aesni.h" />
     <ClInclude Include="random_counterengine.h" />
+    <ClInclude Include="random_ctr_aes.h" />
+    <ClInclude Include="random_lcg_aes.h" />
     <ClInclude Include="random_rdrandengine.h" />
     <ClInclude Include="random_xoroshiro128plus.h" />
+    <ClInclude Include="random_xoroshiro128plus_aes.h" />
     <ClInclude Include="random_xorshift1024star.h" />
     <ClInclude Include="random_xorshift128plus.h" />
+    <ClInclude Include="random_xoshiro256starstar.h" />
     <ClInclude Include="random_zeroengine.h" />
     <ClInclude Include="RngSupport.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="vector128.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GoogleBench.cpp" />
+    <ClCompile Include="randen.cc" />
     <ClCompile Include="RandomBench.cpp" />
     <ClCompile Include="RngSupport.cpp" />
     <ClCompile Include="stdafx.cpp">

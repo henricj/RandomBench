@@ -45,6 +45,27 @@
     <ClInclude Include="random_rdrandengine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="random_xoroshiro128plus_aes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="random_aesni.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="random_lcg_aes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="random_ctr_aes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="randen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="random_xoshiro256starstar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vector128.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -57,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GoogleBench.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="randen.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

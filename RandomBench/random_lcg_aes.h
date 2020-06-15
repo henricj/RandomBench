@@ -47,13 +47,17 @@ namespace ExtraGenerators
          {
             if (++index_ >= size_)
             {
-               auto prev = out_[size_ - 1];
+               const auto count_key = _mm_aesenc_si128(count_, count_);
+               auto a = a_;
+               auto prev = _mm_shuffle_epi32(out_[size_ - 1], _MM_SHUFFLE(1, 0, 3, 2));
                for (auto i = 0; i < size_; ++i)
                {
-                  const auto x = _mm_aesenc_si128(s_[i], _mm_add_epi64(count_, prev));
-                  s_[i] = _mm_add_epi32(_mm_mullo_epi32(a_, s_[i]), c_[i]);
-                  prev = out_[i];
-                  out_[i] = _mm_aesenc_si128(out_[i], x);
+                  const auto key1 = _mm_aesenc_si128(prev, count_key);
+                  const auto key0 = _mm_aesenc_si128(s_[i], prev);
+                  s_[i] = _mm_add_epi32(_mm_mullo_epi32(a, s_[i]), c_[i]);
+                  a = _mm_shuffle_epi32(a, _MM_SHUFFLE(0, 3, 2, 1));
+                  prev = _mm_shuffle_epi32(out_[i], _MM_SHUFFLE(1, 0, 3, 2));
+                  out_[i] = _mm_aesenc_si128(_mm_xor_si128(out_[i], key0), key1);
                }
 
                increment(count_);
